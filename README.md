@@ -155,7 +155,7 @@ simple answer no , but you will make an ai agent that can access through things 
 
 you are not replacing your logging system you are giving intelligence to it 
 
-![[image.png]]
+![Logging Diagram](image.png)
 
 # Key points Why an AI agent might do it well 
 
