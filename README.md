@@ -155,7 +155,7 @@ simple answer no , but you will make an ai agent that can access through things 
 
 you are not replacing your logging system you are giving intelligence to it 
 
-![[Pasted image 20260314194938.png]]
+![[Pasted image 2026031314194938.png]]
 
 # Key points Why an AI agent might do it well 
 
