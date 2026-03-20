@@ -10,7 +10,7 @@ load_dotenv()
 # Disable tracing
 set_tracing_disabled(disabled=True)
 
-model = "gemini/gemini-2.0-flash"
+model = "gemini/gemini-3-flash-preview"
 api_key = os.environ.get("GEMINI_API_KEY")
 
 if not api_key:
