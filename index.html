@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Logging System for DevOps</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/themes/vue.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-darklight-theme@latest/dist/style.min.css">
+  <style>
+    :root {
+      --theme-color: #7c3aed;
+      --sidebar-width: 280px;
+    }
+    .app-name-link img {
+      width: 24px;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    .sidebar-toggle {
+      background-color: transparent;
+    }
+    .search .input-wrap input {
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .sidebar ul li a {
+      font-size: 14px;
+    }
+    nav.app-nav {
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    window.$docsify = {
+      name: '🔍 AI Logging DevOps',
+      nameLink: '/',
+      repo: 'https://github.com/vanessasara/devops-in-ai-',
+      loadSidebar: true,
+      loadNavbar: true,
+      subMaxLevel: 3,
+      auto2top: true,
+      search: {
+        maxAge: 86400000,
+        paths: 'auto',
+        placeholder: 'Search docs...',
+        noData: 'No results found',
+        depth: 4,
+        hideOtherSidebarContent: false,
+      },
+      themeColor: '#7c3aed',
+      darklightTheme: {
+        siteFont: 'Source Sans Pro',
+        defaultTheme: 'light',
+        codeFontFamily: 'Roboto Mono, Monaco, courier, monospace',
+        bodyFontSize: '15px',
+        dark: {
+          accent: '#7c3aed',
+          toogleBackground: '#1e1e2e',
+          background: '#1e1e2e',
+          textColor: '#cdd6f4',
+          codeTextColor: '#cdd6f4',
+          codeBackGroundColor: '#181825',
+          borderColor: '#313244',
+          blockQuoteColor: '#a6adc8',
+          highlightColor: '#313244',
+          sidebarSublink: '#a6adc8',
+          codeTypeColor: '#cba6f7',
+          coverBackground: '#1e1e2e',
+          toogleImage: 'url(https://cdn.jsdelivr.net/npm/docsify-darklight-theme@latest/icons/sun.svg)',
+        },
+        light: {
+          accent: '#7c3aed',
+          toogleBackground: '#eff1f5',
+          background: '#ffffff',
+          textColor: '#4c4f69',
+          codeTextColor: '#4c4f69',
+          codeBackGroundColor: '#f5f5f5',
+          borderColor: '#e0e0e0',
+          blockQuoteColor: '#6c6f85',
+          highlightColor: '#eff1f5',
+          sidebarSublink: '#6c6f85',
+          codeTypeColor: '#7c3aed',
+          coverBackground: '#ffffff',
+          toogleImage: 'url(https://cdn.jsdelivr.net/npm/docsify-darklight-theme@latest/icons/moon.svg)',
+        },
+      },
+      pagination: {
+        previousText: '← Previous',
+        nextText: 'Next →',
+        crossChapter: true,
+      },
+    }
+  </script>
+
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-darklight-theme@latest/dist/index.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code/dist/docsify-copy-code.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-python.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-typescript.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-toml.min.js"></script>
+</body>
+</html>
