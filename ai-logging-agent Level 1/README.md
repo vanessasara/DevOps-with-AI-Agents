@@ -129,9 +129,6 @@ Create a `.env` file in the `backend/` directory:
 
 ```env
 GEMINI_API_KEY=your_gemini_api_key_here
-GEMINI_MODEL=gemini/gemini-3-flash-preview
-LOG_DIRECTORY=logs
-TEMPERATURE=0.1
 ```
 
 ### 4. Frontend Environment Variables
