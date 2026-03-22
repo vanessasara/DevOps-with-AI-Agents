@@ -136,7 +136,7 @@ GEMINI_API_KEY=your_gemini_api_key_here
 Create a `.env.local` file in the `frontend/` directory. There is only **one required variable** — the backend API URL:
 
 ```env
-NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
 Update this value if your backend is running on a different host or port (e.g., in production or Docker).
