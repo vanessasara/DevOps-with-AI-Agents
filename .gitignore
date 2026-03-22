@@ -1,0 +1,2 @@
+# local installers / binaries not meant for the repo
+*.deb
