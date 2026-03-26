@@ -1,0 +1,174 @@
+---
+id: 0001
+title: Update Project Constitution to v1.0.0
+stage: constitution
+date: 2026-03-26
+surface: agent
+model: gemini-2.0-flash
+feature: none
+branch: main
+user: venisa-sara
+command: /sp.constitution @constitution.txt
+labels: [constitution, setup, project-v4]
+links:
+  spec: null
+  ticket: null
+  adr: null
+  pr: null
+files:
+  - .specify/memory/constitution.md
+  - .gemini/commands/sp.constitution.toml
+tests:
+  - none
+---
+
+## Prompt
+
+/sp.constitution @constitution.txt
+
+Content of constitution.txt:
+# Project Constitution — Level 4 AI Logging Agent
+
+## 1. Mission
+
+Build a production-grade AI incident response agent that detects, classifies, and remediates infrastructure failures with human oversight. The system must feel like a real DevOps tool — fast, observable, and trustworthy — not a demo. Every action must be auditable. No action must happen without human approval.
+
+---
+
+## 2. Core Deliverables
+
+1. A Streamlit chat interface that starts Temporal workflows and sends approval signals
+2. A Temporal-orchestrated incident response pipeline with durable execution and full audit trail
+3. An AI agent (OpenAI Agents SDK + Gemini via LiteLLM) that correlates logs across multiple pods
+4. MCP-connected tools for AWS RDS reboot and Slack notifications with safe placeholder fallback
+5. SQLite pattern memory that recognises recurring incidents and surfaces known fixes
+6. A human approval gate enforced at three layers — system prompt, tool docstring, and Temporal Signal
+
+---
+
+## 3. Success Criteria
+
+- Agent correctly identifies connection pool exhaustion across all three pods from log evidence
+- Slack alert is sent before any infrastructure action is proposed
+- Workflow pauses durably at the approval gate — zero CPU consumed while waiting
+- Typing `yes` sends a Temporal Signal and triggers RDS reboot activity
+- Typing `no` ends the workflow cleanly with no action taken
+- Temporal UI at `localhost:8233` shows full event history for every workflow execution
+- Pattern memory correctly surfaces prior incident context on second run of the same issue
+- All five verification tests in Phase 15 pass before the level is marked complete
+
+---
+
+## 4. Non-Goals
+
+- No autonomous execution — human approval is required for every destructive action, always
+- No frontend beyond Streamlit at this level — Next.js promotion happens in Level 5
+- No distributed agent teams — that is Level 5 territory
+- No cloud deployment at this level — local development only
+- No authentication or multi-user support
+- No real-time log streaming — file-based logs only at this level
+
+---
+
+## 5. Architecture Principles
+
+**Layers never reach across each other.**
+Tools do not know about workflows. Workflows do not import from `app.py`. The agent does not know about Temporal. Each layer has one job.
+
+**Placeholder mode everywhere.**
+AWS, Slack, and Kubernetes all run in simulation mode when credentials are not configured. The agent still receives a response and can complete its reasoning. Nothing breaks. Nothing is hidden.
+
+**Temporal owns durability.**
+The workflow is the source of truth for what happened. Not logs. Not print statements. The Temporal event history is the audit trail. Every activity input and output is stored automatically.
+
+**The approval gate has three layers.**
+System prompt tells the agent to ask for approval. Tool docstring tells the agent never to call the tool without a yes. Temporal Signal is the hard gate — the workflow cannot proceed to the execute activity without it. One layer failing does not compromise the others.
+
+**SQLite is the only database.**
+No Postgres, no Redis, no external services. Pattern memory is a local SQLite file. Simple, portable, zero infrastructure.
+
+**Folder structure:**
+```
+05-Projects/04-Complex-Agent-with-Actions-Memory-and-Durable-Execution/
+
+├── app.py              ← UI only — starts workflows, sends signals
+├── worker.py           ← Temporal worker — registers and runs activities
+├── system_prompt.txt   ← agent behaviour — edit without touching Python
+├── src/
+│   ├── config.py       ← all env vars and placeholder detection
+│   ├── memory/         ← SQLite store
+│   ├── tools/          ← @function_tool and MCP tool functions
+│   ├── agents/         ← Agent + Runner
+│   └── workflows/      ← Temporal workflow and activities
+├── logs/               ← sample log files
+└── data/               ← SQLite database file (gitignored)
+```
+
+---
+
+## 6. User Stories
+
+1. As an on-call engineer I want the agent to read all pod logs and correlate the issue across the cluster so I have full context before making a decision
+2. As an on-call engineer I want the team to be alerted on Slack automatically before I am asked to approve any action
+3. As an on-call engineer I want to type yes or no in a chat interface and have the system respond accordingly without any ambiguity
+4. As an on-call engineer I want every step of the incident response recorded so I can audit what happened and why
+5. As an on-call engineer I want the agent to tell me if it has seen this problem before and what fixed it last time
+6. As a developer I want to run the whole system locally without any cloud accounts configured
+
+---
+
+## 7. Constraints
+
+- Must run fully on a laptop without any cloud credentials (placeholder mode covers all external services)
+- Temporal must be started with `temporal server start-dev` — no Docker required
+- SQLite only — no external database dependencies
+- uv for package management — no pip, no poetry
+- Must not require kubectl or a real Kubernetes cluster (K8S_ENABLED=false by default)
+- All five verification tests must pass before the level is marked done
+
+---
+
+## 8. Risks and Mitigations
+
+| Risk | Mitigation |
+|---|---|
+| Temporal not installed | Document `brew install temporal` and the curl script in Phase 15 |
+| Agent calls RDS reboot without approval | Three-layer gate — prompt + docstring + Signal. All three must be bypassed simultaneously |
+| Worker not running when workflow starts | Phase 15 specifies start order — Temporal first, worker second, app third |
+| Agent does not correlate across all pods | System prompt explicitly instructs "read all log files before drawing conclusions" |
+| Pattern memory returns stale context | `get_context_for_agent` returns empty string if no history — agent proceeds normally |
+| AWS or Slack credentials missing | Config detects missing credentials and returns placeholder strings — nothing breaks |
+| Workflow approval timeout | 30-minute timeout documented. Workflow ends cleanly with "no action taken" message |
+
+---
+
+## 9. Definition of Done
+
+- All phases in AGENTS.md completed in order
+- All three processes running: `temporal server start-dev`, `worker.py`, `app.py`
+- All five tests in Phase 15 pass
+- Temporal UI shows complete event history for at least two workflow executions
+- SQLite `data/incidents.db` exists and contains at least one incident record
+- Second run of the same incident shows pattern memory context in the agent response
+- AGENTS.md deleted from the project folder
+- DONE.md created with the summary of what was built
+
+
+## Response snapshot
+
+Updated the project constitution to v1.0.0 and corrected the sp.constitution.toml command file. The constitution establishes core principles for the Level 4 AI Logging Agent, including mission-driven incident response, separation of concerns, and multi-layer human approval gates.
+
+## Outcome
+
+- ✅ Impact: Established core principles for Level 4 AI Logging Agent.
+- 🧪 Tests: none
+- 📁 Files: Created constitution.md, updated sp.constitution.toml
+- 🔁 Next prompts: /sp.specify for the first feature
+- 🧠 Reflection: Corrected model-specific references in command files and handled PHR script failure due to git root mismatch.
+
+## Evaluation notes (flywheel)
+
+- Failure modes observed: Shell script failed due to git root mismatch.
+- Graders run and results (PASS/FAIL): PASS
+- Prompt variant (if applicable): none
+- Next experiment (smallest change to try): none
