@@ -3,30 +3,27 @@
 ## Entities
 
 ### IncidentWorkflow
-Represents the durable execution of a diagnosis and remediation plan managed by Temporal.
-
-| Field | Type | Description |
-|---|---|---|
-| workflow_id | string | Unique identifier for the Temporal execution |
-| status | enum | [Running, Waiting_For_Approval, Completed, Failed, Timed_Out] |
-| start_time | iso8601 | When the workflow was initiated |
-| logs | array[string] | Audit trail of activities completed |
-| error | string? | Details of any failure |
+- **Workflow ID**: Unique identifier (UUID or incident-based slug).
+- **Status**: RUNNING, COMPLETED, FAILED, TIMED_OUT.
+- **Start Time**: Timestamp of when the on-call engineer initiated.
+- **Last Event**: Most recent activity completion or signal received.
 
 ### ApprovalSignal
-Represents the user's decision (True/False) to proceed with a remediation action.
+- **Signal Name**: `approval`.
+- **Payload**: `bool` (True for yes, False for no).
+- **Sender**: `on-call engineer` (via chat UI).
+- **Received At**: Timestamp recorded by Temporal.
 
-| Field | Type | Description |
-|---|---|---|
-| decision | boolean | True for 'yes', False for 'no' |
-| timestamp | iso8601 | When the signal was sent |
-| source | string | Source of the signal (e.g., "Streamlit UI") |
+### AuditTrail
+- **Events**: List of `WorkflowEvent`.
+- **WorkflowEvent**:
+  - `type`: ActivityStarted, ActivityCompleted, SignalReceived, MarkerAdded.
+  - `message`: Text description for display in Streamlit chat.
+  - `timestamp`: UTC.
 
-### ChatSession
-Represents the user's local interaction history in the Streamlit app.
-
-| Field | Type | Description |
-|---|---|---|
-| session_id | string | Local session ID |
-| messages | array[object] | Collection of {role, content} pairs for rendering |
-| active_workflow_id | string? | Reference to the current running workflow |
+## State Transitions
+1. **PENDING**: Workflow started, awaiting diagnosis activities.
+2. **WAITING_APPROVAL**: Diagnosis complete, paused for `approval` signal.
+3. **EXECUTING**: Signal "yes" received, remediation activities running.
+4. **TERMINATED**: Signal "no" received or timeout occurred.
+5. **FINAL**: Result recorded in SQLite memory and UI.

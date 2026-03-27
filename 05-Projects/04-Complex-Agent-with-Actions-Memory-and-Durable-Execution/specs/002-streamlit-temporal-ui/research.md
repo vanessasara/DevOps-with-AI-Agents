@@ -1,20 +1,25 @@
 # Research: Streamlit-Temporal UI
 
-## 1. Streamlit and Temporal Event Loop Integration
-**Decision**: Use a global Temporal client managed in Streamlit's `st.session_state`.
-**Rationale**: Streamlit reruns the script on every interaction. Maintaining a single Temporal client prevents overhead and connection exhaustion.
-**Alternatives considered**: Creating a client per request (too slow, resource intensive).
+## Decision: Background Polling for UI Updates
+- **Chosen**: Streamlit `st.fragment` or `st.empty` with a `while True` loop and `time.sleep` (or `st.rerun` at an interval).
+- **Rationale**: Streamlit does not support native push from a server. Polling the Temporal Client for workflow status is the most reliable way to update the chat UI with activity logs.
+- **Alternatives Considered**: 
+  - WebSockets: Overly complex for a local DevOps tool; not natively supported in Streamlit's model without external components.
+  - Streamlit `st_autorefresh`: Third-party component, avoid external dependencies where possible.
 
-## 2. Real-time Workflow Status Updates
-**Decision**: Implement a background polling mechanism or use Streamlit's `st.empty()` to render the latest workflow history from the Temporal Event History.
-**Rationale**: Temporal workflows are long-running and durable. The UI needs to reflect state changes (e.g., when an activity completes or an approval is requested).
-**Alternatives considered**: WebSockets (too complex for a local Streamlit app).
+## Decision: Temporal Client Session Management
+- **Chosen**: Store the `TemporalClient` instance in `st.session_state`.
+- **Rationale**: Connecting to Temporal on every rerun is inefficient. Maintaining a single persistent client per session ensures lower latency for signal delivery and status checks.
+- **Alternatives Considered**: Global client instance (risky in multi-user Streamlit, though not a current non-goal).
 
-## 3. Human Approval Gate Implementation
-**Decision**: Capture user input ("yes"/"no") through `st.chat_input` and translate it to a Temporal Signal sent to the specific `WorkflowID`.
-**Rationale**: Aligns with the multi-layer gate principle (Temporal Signal is the hard gate).
-**Alternatives considered**: UI buttons (Streamlit's `st.button` can be tricky with chat-based history).
+## Decision: Three-Layer Approval Gate Implementation
+- **Chosen**:
+  1. **Prompt**: "Always ask for approval before calling destructive tools."
+  2. **Docstring**: "DO NOT call this tool unless the user has explicitly typed 'yes'."
+  3. **Signal**: The Temporal workflow pauses at `workflow.wait_condition` until a "yes/no" signal is received.
+- **Rationale**: Aligns strictly with Principle V of the Constitution.
+- **Alternatives Considered**: Single layer UI-only check (rejected as unsafe).
 
-## 4. Environment and Secrets
-**Decision**: Use `.env` file and `src/config.py` for all environment variables, including `TEMPORAL_ADDRESS` and `K8S_ENABLED`.
-**Rationale**: Strictly follows the constitution and ensures portability to placeholder mode.
+## Decision: Workflow Persistence in UI
+- **Chosen**: SQLite session history for the chat + Temporal History for the workflow state.
+- **Rationale**: `st.session_state` is lost on browser refresh. SQLite ensures the chat log persists (FR-006).

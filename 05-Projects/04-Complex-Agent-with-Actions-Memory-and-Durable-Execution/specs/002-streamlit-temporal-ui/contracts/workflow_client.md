@@ -1,24 +1,23 @@
-# Contract: Workflow Client (UI -> Temporal)
+# Contract: UI -> Temporal Client Proxy
 
-## Purpose
-Defines how the Streamlit UI interacts with the Temporal service to manage workflows.
+## TemporalClientProxy Interface
 
-## Interface: `TemporalClientProxy`
+### `start_incident_workflow(workflow_id: str) -> WorkflowHandle`
+- **Description**: Connects to Temporal and starts `IncidentWorkflow`.
+- **Input**: Unique string for workflow identification.
+- **Output**: Returns a handle to the running workflow.
+- **Error**: `TemporalConnectionError` if server is unreachable.
 
-### `start_incident_workflow(incident_type: str) -> str`
-Initiates a new `IncidentWorkflow` and returns the `workflow_id`.
-- **Input**: `incident_type` (e.g., "reboot-rds")
-- **Output**: `workflow_id` (string)
-- **Error**: `TemporalServiceError` if connection fails.
+### `send_approval_signal(workflow_id: str, approved: bool) -> None`
+- **Description**: Sends a "yes/no" signal to the specified workflow.
+- **Input**: `workflow_id` (str), `approved` (bool).
+- **Output**: None (void).
+- **Error**: `WorkflowNotFoundError` if the handle is invalid or expired.
 
-### `send_approval_signal(workflow_id: str, decision: bool) -> None`
-Sends the "yes/no" signal to the specified workflow.
-- **Input**: `workflow_id`, `decision` (boolean)
-- **Output**: None
-- **Error**: `WorkflowNotFoundError` or `SignalDeliveryError`.
-
-### `get_workflow_status(workflow_id: str) -> IncidentWorkflow`
-Retrieves the current status and event history for UI rendering.
-- **Input**: `workflow_id`
-- **Output**: `IncidentWorkflow` object
-- **Error**: `WorkflowNotFoundError`.
+### `get_workflow_status(workflow_id: str) -> WorkflowStatus`
+- **Description**: Polled by the UI to update the status and history.
+- **Input**: `workflow_id`.
+- **Output**:
+  - `status`: RUNNING | COMPLETED | FAILED.
+  - `history`: List of activity log messages.
+  - `waiting_for_approval`: Boolean.
