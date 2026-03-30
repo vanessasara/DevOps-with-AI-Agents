@@ -1,135 +1,88 @@
-# Tasks: Streamlit-Temporal UI
+# Tasks: Level 4 AI Logging Agent
 
-**Input**: Design documents from `specs/002-streamlit-temporal-ui/`
-**Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/
-
-## Format: `[ID] [P?] [Story] Description`
-
-- **[P]**: Can run in parallel (different files, no dependencies)
-- **[Story]**: Which user story this task belongs to (e.g., US1, US2, US3)
-- Include exact file paths in descriptions
+**Constitution**: `constitution.txt`
+**Goal**: Production-grade AI incident response agent with human approval gate
 
 ---
 
-## Phase 1: Setup (Shared Infrastructure)
+## Phase 1: Core Infrastructure ✓ (Complete)
 
-**Purpose**: Project initialization and basic structure
-
-- [ ] T001 Create project structure `src/workflows`, `src/agents`, `src/memory`, `logs`, `data` per plan.md
-- [ ] T002 Initialize Python project with `uv` and install `streamlit`, `temporalio`, `pydantic`, `litellm`
-- [ ] T003 [P] Configure `.gitignore` to exclude `__pycache__/`, `.venv/`, `data/*.db`, and `logs/*.log`
-
----
-
-## Phase 2: Foundational (Blocking Prerequisites)
-
-**Purpose**: Core infrastructure that MUST be complete before ANY user story can be implemented
-
-- [ ] T004 Implement environment configuration in `src/config.py` (Temporal address, K8S_ENABLED, credentials detection)
-- [ ] T005 [P] Create Temporal worker boilerplate in `worker.py` to register workflows and activities
-- [ ] T006 Implement `TemporalClientProxy` in `src/agents/temporal_proxy.py` per contracts/workflow_client.md
-
-**Checkpoint**: Foundation ready - Streamlit app can now be built on top of the Temporal proxy
+- [X] Project structure: `src/`, `app.py`, `worker.py`
+- [X] Dependencies: `uv` with `streamlit`, `temporalio`, `pydantic`, `litellm`
+- [X] `.gitignore` for Python artifacts
+- [X] Basic Temporal workflow with signal approval
 
 ---
 
-## Phase 3: User Story 1 - Start Incident Workflow (Priority: P1) 🎯 MVP
+## Phase 2: Agent & Tools ✓ (Complete)
 
-**Goal**: Initiate an incident response workflow via a chat interface.
-
-**Independent Test**: Type "start incident" in the Streamlit UI and verify a new workflow appears in the Temporal UI at `localhost:8233`.
-
-### Tests for User Story 1
-
-- [ ] T007 [P] [US1] Create unit test for `start_incident_workflow` in `tests/test_temporal_proxy.py`
-
-### Implementation for User Story 1
-
-- [ ] T008 [US1] Define initial `IncidentWorkflow` in `src/workflows/incident_workflow.py` with a simple log activity
-- [ ] T009 [US1] Implement basic Streamlit chat UI in `app.py` with `st.chat_input` and `st.session_state` messages
-- [ ] T010 [US1] Connect `app.py` to `TemporalClientProxy.start_incident_workflow` when user types "start incident"
-- [ ] T011 [US1] Display acknowledgment message in `app.py` when workflow successfully starts
-
-**Checkpoint**: User Story 1 functional - basic "Trigger" MVP complete.
+- [X] Add `openai` package for OpenAI Agents SDK
+- [X] Add `mcp` package for tool connectivity
+- [X] Run `uv sync`
+- [X] Create `system_prompt.txt` with three-layer approval instructions
+- [X] Include: "Never execute destructive actions without human approval"
+- [X] Include: "Read all log files before drawing conclusions"
+- [X] Create `src/tools/__init__.py`
+- [X] Create `src/tools/aws_tools.py` with placeholder RDS reboot function
+- [X] Create `src/tools/slack_tools.py` with placeholder notification function
+- [X] Add `@function_tool` docstrings requiring human approval
+- [X] Create `src/agents/incident_agent.py` using OpenAI Agents SDK (via LiteLLM)
+- [X] Connect agent to LiteLLM for Gemini fallback
+- [X] Load system prompt from `system_prompt.txt`
+- [X] Register tools with agent
 
 ---
 
-## Phase 4: User Story 2 - Human Approval Gate (Priority: P2)
+## Phase 3: Pattern Memory ✓ (Complete)
 
-**Goal**: Approve or reject suggested remediations via the chat interface.
-
-**Independent Test**: Start a workflow that waits for approval, type "yes" in chat, and verify the workflow receives the signal and completes.
-
-### Tests for User Story 2
-
-- [ ] T012 [P] [US2] Create integration test for `send_approval_signal` in `tests/test_temporal_proxy.py`
-
-### Implementation for User Story 2
-
-- [ ] T013 [US2] Update `IncidentWorkflow` in `src/workflows/incident_workflow.py` to include a `wait_for_external_signal` gate
-- [ ] T014 [US2] Update `app.py` to detect "yes"/"no" inputs and call `TemporalClientProxy.send_approval_signal`
-- [ ] T015 [US2] Add visual indicator in `app.py` when the system is waiting for human approval
-
-**Checkpoint**: User Story 2 functional - Human-in-the-loop safety gate active.
+- [X] Create `src/memory/__init__.py`
+- [X] Create `src/memory/pattern_store.py` with SQLite connection
+- [X] Create `incidents` table schema (id, pattern, resolution, timestamp)
+- [X] Memory Functions: `save_incident` and `get_context_for_agent`
 
 ---
 
-## Phase 5: User Story 3 - View Workflow History (Priority: P3)
+## Phase 4: Sample Logs ✓ (Complete)
 
-**Goal**: See the status and history of the incident response in the chat window.
-
-**Independent Test**: Run a full workflow and verify that activities appear in the chat as they complete.
-
-### Implementation for User Story 3
-
-- [ ] T016 [US3] Implement `TemporalClientProxy.get_workflow_status` in `src/agents/temporal_proxy.py` to fetch event history
-- [ ] T017 [US3] Implement background polling/refresh logic in `app.py` to update chat with workflow logs
-- [ ] T018 [US3] Add error handling in `app.py` to display workflow failures or timeouts
-
-**Checkpoint**: All user stories functional - Full visibility and control loop complete.
+- [X] Create `logs/pod-1.log` with connection pool exhaustion errors
+- [X] Create `logs/pod-2.log` with connection pool exhaustion errors
+- [X] Create `logs/pod-3.log` with connection pool exhaustion errors
+- [X] Ensure logs show correlation pattern (same error across pods)
 
 ---
 
-## Phase 6: Polish & Cross-Cutting Concerns
+## Phase 5: Enhanced Workflow ✓ (Complete)
 
-**Purpose**: Improvements that affect multiple user stories
-
-- [ ] T019 [P] Update `README.md` with setup instructions from `quickstart.md`
-- [ ] T020 Run full validation of `quickstart.md` local run instructions
-- [ ] T021 Code cleanup and docstring updates in `src/`
-- [ ] T022 Ensure `data/` and `logs/` directories are correctly handled in `app.py` and `worker.py`
+- [X] Create `src/workflows/activities.py` with log reading, analysis, and tools
+- [X] Update `src/workflows/incident_workflow.py` to sequence activities and signals
+- [X] Update `worker.py` to register new activities
 
 ---
 
-## Dependencies & Execution Order
+## Phase 6: UI Integration ✓ (Complete)
 
-### Phase Dependencies
-
-1. **Setup (Phase 1)** -> **Foundational (Phase 2)**
-2. **Foundational (Phase 2)** -> **User Story 1 (Phase 3)**
-3. **User Story 1 (Phase 3)** -> **User Story 2 (Phase 4)** (requires workflow to signal)
-4. **User Story 1 (Phase 3)** -> **User Story 3 (Phase 5)** (requires status to fetch)
-5. **All Stories** -> **Polish (Phase 6)**
-
-### Parallel Opportunities
-
-- T003 (gitignore) can run with T001/T002.
-- T005 (worker boilerplate) and T006 (proxy) can run in parallel.
-- Tests (T007, T012) can be written while implementation is in progress.
+- [X] Update `app.py` to display progress, handle signals, and show pattern memory
 
 ---
 
-## Implementation Strategy
+## Phase 7: Verification Tests ✓ (Complete)
 
-### MVP First (User Story 1 Only)
+- [X] Test 1: Agent identifies connection pool exhaustion across all 3 pods
+- [X] Test 2: Slack alert sent before infrastructure action proposed
+- [X] Test 3: Workflow pauses durably at approval gate
+- [X] Test 4: `yes` signal triggers RDS reboot, `no` ends cleanly
+- [X] Test 5: Pattern memory surfaces context on second run
 
-1. Setup structure and dependencies.
-2. Build `config.py` and `temporal_proxy.py`.
-3. Create a skeletal `IncidentWorkflow`.
-4. Build the `app.py` chat shell.
-5. **Validate**: Start a workflow from the UI.
+---
 
-### Incremental Delivery
+## Progress Tracking
 
-- Add Signal logic (US2) to make it safe.
-- Add History polling (US3) to make it observable.
+| Phase | Status | Notes |
+|-------|--------|-------|
+| 1. Core Infrastructure | ✓ Complete | Basic workflow works |
+| 2. Agent & Tools | ✓ Complete | Agent + Tools integrated |
+| 3. Pattern Memory | ✓ Complete | SQLite storage ready |
+| 4. Sample Logs | ✓ Complete | Correlation logs created |
+| 5. Enhanced Workflow | ✓ Complete | Complex workflow logic |
+| 6. UI Integration | ✓ Complete | Interactive Streamlit UI |
+| 7. Verification | ✓ Complete | All core tests pass |
