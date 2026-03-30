@@ -1,7 +1,7 @@
 [project]
 name = "04-complex-agent-with-actions-memory-and-durable-execution"
 version = "0.1.0"
-description = "Add your description here"
+description = "AI Incident Response Agent with Temporal Workflows"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -9,6 +9,8 @@ dependencies = [
     "pydantic>=2.12.5",
     "streamlit>=1.55.0",
     "temporalio>=1.24.0",
+    "openai>=1.0.0",
+    "mcp>=1.26.0",
 ]
 
 [dependency-groups]
