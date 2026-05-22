@@ -1,15 +1,15 @@
 from agents import Agent
 from agents.extensions.models.litellm_model import LitellmModel
 from ..config import Config
-from ..tools.k8s_tools import list_pods, describe_pod, restart_kubernetes_pod, fix_image, patch_resources
+from ..tools.docker_tools import list_containers, get_container_logs, inspect_container, restart_container
 
 def _make_model(model_name: str) -> LitellmModel:
     api_key = Config.GROQ_API_KEY if model_name.startswith("groq/") else Config.GEMINI_API_KEY
     return LitellmModel(model=model_name, api_key=api_key)
 
-k8s_agent = Agent(
-    name="K8s Specialist",
-    instructions="Diagnose Kubernetes issues only. Use only K8s tools. Never call Docker or GitHub tools.",
+docker_agent = Agent(
+    name="Docker Specialist",
+    instructions="Diagnose Docker issues only. Use only Docker tools. Never call K8s or GitHub tools.",
     model=_make_model(Config.GEMINI_MODEL),
-    tools=[list_pods, describe_pod, restart_kubernetes_pod, fix_image, patch_resources],
+    tools=[list_containers, get_container_logs, inspect_container, restart_container],
 )

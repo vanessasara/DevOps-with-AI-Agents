@@ -9,4 +9,6 @@ dependencies = [
     "openai-agents[litellm]>=0.0.19",
     "python-dotenv",
     "streamlit",
+    "fastmcp",
+    "temporalio",
 ]

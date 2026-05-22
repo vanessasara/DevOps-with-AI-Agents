@@ -87,5 +87,33 @@ def restart_kubernetes_pod(
         return f"Error restarting pod: {e}"
 
 
+@function_tool
+def fix_image(resource_type: str, resource_name: str, namespace: str, correct_image: str, reason: str) -> str:
+    """Patch a Kubernetes resource to fix a wrong container image.
+    ALWAYS get explicit user approval before calling."""
+    if not Config.K8S_ENABLED:
+        return f"[SIMULATED] kubectl set image {resource_type}/{resource_name} app={correct_image} -n {namespace}\nReason: {reason}"
+    r = subprocess.run(
+        ["kubectl", "set", "image", f"{resource_type}/{resource_name}",
+         f"app={correct_image}", "-n", namespace],
+        capture_output=True, text=True
+    )
+    return r.stdout or r.stderr
+
+@function_tool
+def patch_resources(resource_type: str, resource_name: str, namespace: str, memory_limit: str, reason: str) -> str:
+    """Patch memory limits on a Kubernetes resource.
+    ALWAYS get explicit user approval before calling."""
+    patch = f'{{"spec":{{"template":{{"spec":{{"containers":[{{"name":"app","resources":{{"limits":{{"memory":"{memory_limit}"}}}}}}]}}}}}}}}'
+    if not Config.K8S_ENABLED:
+        return f"[SIMULATED] kubectl patch {resource_type} {resource_name} -n {namespace}\nPatch: {patch}\nReason: {reason}"
+    r = subprocess.run(
+        ["kubectl", "patch", resource_type, resource_name, "-n", namespace,
+         "--patch", patch],
+        capture_output=True, text=True
+    )
+    return r.stdout or r.stderr
+
+
 def get_k8s_tools():
-    return [list_pods, describe_pod, get_pod_logs, get_events, restart_kubernetes_pod]
+    return [list_pods, describe_pod, get_pod_logs, get_events, restart_kubernetes_pod, fix_image, patch_resources]
