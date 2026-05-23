@@ -22,5 +22,5 @@ agent = Agent(
     model=OpenAIChatCompletionsModel(model=MODEL, openai_client=client),
 )
 
-result = Runner.run_sync(starting_agent=agent, input="hi")
+result = Runner.run_sync(starting_agent=agent, input="tell me about DevOps engineering?")
 print(result.final_output)
