@@ -36,17 +36,40 @@ st.set_page_config(
 )
 
 MODE_META = {
-    "Summarizer Dashboard": {
+    "Summarizer": {
         "icon": "📊",
         "desc": "Executive-level infrastructure health summary using all available tools.",
+        "agent": "summarizer_agent",
     },
     "Kubernetes Operations": {
         "icon": "☸️",
         "desc": "Deep kubectl inspection — pods, logs, events, and patches.",
+        "agent": "k8s_agent",
     },
     "Full Analysis": {
         "icon": "🔍",
         "desc": "Triage agent routes your query to the right specialist automatically.",
+        "agent": "triage_agent",
+    },
+    "Log Analysis": {
+        "icon": "📜",
+        "desc": "Parse and analyze logs to surface anomalies and errors.",
+        "agent": "log_analyzer",
+    },
+    "Docker Operations": {
+        "icon": "🐳",
+        "desc": "Inspect and manage Docker containers, images, and networks.",
+        "agent": "docker_agent",
+    },
+    "GitHub Operations": {
+        "icon": "🐙",
+        "desc": "Query repos, PRs, issues, and commit history via GitHub.",
+        "agent": "github_agent",
+    },
+    "Auto-Healer": {
+        "icon": "🩺",
+        "desc": "Detect and automatically remediate infrastructure issues.",
+        "agent": "healer_agent",
     },
 }
 
@@ -86,20 +109,20 @@ def apply_styles() -> None:
         /* ── Page header ─────────────────────────────────────── */
         .ir-header {
             display: flex;
-            align-items: flex-start;
-            gap: 1rem;
+            align-items: center;
+            gap: .75rem;
             border-bottom: 1px solid #1e293b;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1.25rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
         }
-        .ir-header-icon { font-size: 2.4rem; line-height: 1; flex-shrink: 0; }
         .ir-header h1 {
-            font-size: 1.65rem;
+            font-size: 1.55rem;
             font-weight: 700;
-            margin: 0 0 .2rem;
+            margin: 0 0 .15rem;
             color: #f1f5f9;
+            line-height: 1.2;
         }
-        .ir-header p { font-size: .9rem; color: #64748b; margin: 0; }
+        .ir-header p { font-size: .88rem; color: #64748b; margin: 0; }
 
         /* ── Mode badge ──────────────────────────────────────── */
         .ir-badge {
@@ -209,7 +232,7 @@ def initialize_session_state() -> None:
         try:
             Config.validate()
             st.session_state.agents = {
-                "Summarizer Dashboard": SummarizerAgent(),
+                "Summarizer": SummarizerAgent(),
                 "Kubernetes Operations": KubernetesAgent(),
                 "Full Analysis": LogAnalyzerAgent(),
             }
@@ -227,7 +250,7 @@ def display_sidebar() -> None:
         st.divider()
 
         st.selectbox("Agent Mode", list(MODE_META.keys()), key="agent_mode")
-        mode = st.session_state.get("agent_mode", "Summarizer Dashboard")
+        mode = st.session_state.get("agent_mode", "Summarizer")
         st.caption(MODE_META[mode]["desc"])
 
         st.divider()
@@ -262,7 +285,6 @@ def render_header(mode: str) -> None:
     st.markdown(
         f"""
         <div class="ir-header">
-            <div class="ir-header-icon">🚨</div>
             <div>
                 <h1>AI DevOps Incident Responder</h1>
                 <p>{meta["desc"]}</p>
@@ -308,7 +330,7 @@ async def get_response(user_input: str, mode: str) -> str:
 
 
 def handle_input(user_input: str) -> None:
-    mode = st.session_state.get("agent_mode", "Summarizer Dashboard")
+    mode = st.session_state.get("agent_mode", "Summarizer")
     icon = MODE_META[mode]["icon"]
 
     st.session_state.messages.append({"role": "user", "content": user_input, "agent": mode})
@@ -331,7 +353,7 @@ def main() -> None:
     initialize_session_state()
     display_sidebar()
 
-    mode = st.session_state.get("agent_mode", "Summarizer Dashboard")
+    mode = st.session_state.get("agent_mode", "Summarizer")
     render_header(mode)
     render_stats()
 

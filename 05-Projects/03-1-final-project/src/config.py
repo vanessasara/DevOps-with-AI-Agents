@@ -9,7 +9,7 @@ load_dotenv()
 
 
 class Config:
-    GEMINI_API_KEY: str | None = os.getenv("GEMINI_API_KEY")
+    OPENROUTER_API_KEY: str | None = os.getenv("OPENROUTER_API_KEY")
     GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini/gemini-2.0-flash")
 
     LOG_DIRECTORY: str = os.getenv("LOG_DIRECTORY", "logs")
@@ -21,8 +21,8 @@ class Config:
 
     @classmethod
     def validate(cls) -> None:
-        if not cls.GEMINI_API_KEY:
-            raise ValueError("GEMINI_API_KEY not set in .env file.")
+        if not cls.OPENROUTER_API_KEY:
+            raise ValueError("OPENROUTER_API_KEY not set in .env file.")
         os.makedirs(cls.LOG_DIRECTORY, exist_ok=True)
 
     @classmethod
